@@ -3,14 +3,14 @@
 <html>
 
 <head>
-    <title>Example 08.07 - Load OBJ and MTL </title>
-    <script type="text/javascript" src="../libs/three.js"></script>
-    <script type="text/javascript" src="../libs/OBJLoader.js"></script>
-    <script type="text/javascript" src="../libs/MTLLoader.js"></script>
-    <script type="text/javascript" src="../libs/OBJMTLLoader.js"></script>
-
-    <script type="text/javascript" src="../libs/stats.js"></script>
-    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <title>Kelompok 8 - UPT BAHASA</title>
+    <script type="text/javascript" src="three.js"></script>
+    <script type="text/javascript" src="OBJLoader.js"></script>
+    <script type="text/javascript" src="MTLLoader.js"></script>
+    <script type="text/javascript" src="OBJMTLLoader.js"></script>
+    <script type="text/javascript" src="TrackballControls.js"></script>
+    <script type="text/javascript" src="stats.js"></script>
+    <script type="text/javascript" src="dat.gui.js"></script>
     <style>
         body {
             /* set margin to 0 and overflow to hidden, to go fullscreen */
@@ -20,16 +20,14 @@
     </style>
 </head>
 <body>
-
 <div id="Stats-output">
 </div>
 <!-- Div which will hold the Output -->
 <div id="WebGL-output">
 </div>
-
 <!-- Javascript code that runs our Three.js examples -->
-<script type="text/javascript">
-
+<script>
+	init();
     // once everything is loaded, we run our Three.js stuff.
     function init() {
 
@@ -48,17 +46,23 @@
         webGLRenderer.shadowMapEnabled = true;
 
         // position and point the camera to the center of the scene
-        camera.position.x = 15;
+        camera.position.x = 12;
         camera.position.y = 2;
         camera.position.z = 0;
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 
         // add spotlight for the shadows
-        var spotLight = new THREE.PointLight(0xffffff);
-        spotLight.position.set(50, 30, 60);
-        spotLight.intensity = 1;
-        scene.add(spotLight);
+        var light = new THREE.DirectionalLight( 0xffffff );
+		light.position.set( 1, 1, 1 );
+		scene.add( light );
+		
+		var light = new THREE.DirectionalLight( 0x002288 );
+		light.position.set( - 1, - 1, - 1 );
+		scene.add( light );
+		
+		var light = new THREE.AmbientLight( 0x222222 );
+		scene.add( light );
 
         // add the output of the renderer to the html element
         document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
@@ -68,18 +72,19 @@
 
 
         // setup the control gui
-        var controls = new function () {
+        var gui_control = new function () {
             // we need the first child, since it's a multimaterial
 
 
         };
 
         var gui = new dat.GUI();
+
         var mesh;
 
         var loader = new THREE.OBJMTLLoader();
 
-        loader.load('GedungUPTbaru.obj', 'GedungUPTbaru.mtl', function (object) {
+        loader.load('GedungUPT1.obj', 'GedungUPT1.mtl', function (object) {
 
             // configure the wings
             var wing2 = object.children[5].children[0];
@@ -119,6 +124,8 @@
             requestAnimationFrame(render);
             webGLRenderer.render(scene, camera);
         }
+        
+    }
 
         function initStats() {
 
@@ -135,8 +142,6 @@
 
             return stats;
         }
-    }
-    window.onload = init;
 </script>
 </body>
 </html>
