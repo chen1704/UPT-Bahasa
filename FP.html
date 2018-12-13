@@ -15,7 +15,6 @@
 
     <script type="text/javascript" src="RectAreaLight.js"></script>
     <script type="text/javascript" src="TrackballControls.js"></script>
-    <script type="text/javascript" src="FirstPersonControls.js"></script>
 
     <style>
         body {
@@ -35,6 +34,7 @@
 
 <!-- Javascript code that runs our Three.js examples -->
 <script type="text/javascript">
+	var pointLight;
 	init_start();
 
     function init_start() {
@@ -86,6 +86,16 @@
 		var light3 = new THREE.AmbientLight( 0x222222 );
 		scene.add( light3 );
 
+		var pointColor = "#ccffcc";
+		pointLight = new THREE.PointLight(pointColor);
+		pointLight.position.set(1.2,-0.2,-0.2);
+		pointLight.distance = 20;
+		scene.add(pointLight);
+
+		pointLight2 = new THREE.PointLight(pointColor);
+		pointLight2.position.set(1.2,-0.2,0.5);
+		pointLight2.distance = 20;
+		scene.add(pointLight2);
         // add the output of the renderer to the html element
         document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
 
@@ -93,42 +103,12 @@
         var step = 0;
 
         // setup the control gui
-        var controls = new function () {
-            // we need the first child, since it's a multimaterial
 
-            this.nightView = function(){
-            	webGLRenderer.setClearColor(new THREE.Color(0x000, 1.0));
-        		scene.remove(light2);
-        		scene.remove(light3);
-
-        		//var pointColor = "#ccffcc";
-		        var spotLight = new THREE.SpotLight(0xffffff);
-		        spotLight.position.set(100, 140, 130);
-		        spotLight.intensity = 2;
-		        scene.add(spotLight);   
-            };
-            this.dayView = function(){
-            	webGLRenderer.setClearColor(new THREE.Color(0xaaaaff, 1.0));
-            	scene.add(light3);
-            	
-            }
-            this.viewFront = function(){
-            	camera.position.x = 12;
-		        camera.position.y = 2;
-		        camera.position.z = 0;
-		        camera.lookAt(new THREE.Vector3(0, 0, 0));
-            };
-	    };
-
-	    var gui = new dat.GUI();
-	    gui.add(controls, 'nightView');
-	    gui.add(controls, 'dayView');
-	    gui.add(controls, 'viewFront');
         var mesh;
 
         var loader = new THREE.OBJMTLLoader();
 
-        loader.load('GedungUPT1.obj', 'GedungUPT1.mtl', function (object) {
+        loader.load('GedungUPT3.obj', 'GedungUPT3.mtl', function (object) {
 
             var wing2 = object.children[5].children[0];
             var wing1 = object.children[4].children[0];
@@ -147,6 +127,43 @@
             mesh = object;
             scene.add(mesh);
         });
+
+        var planeGeometry = new THREE.PlaneGeometry(30, 30, 1, 1);
+        var texture = THREE.ImageUtils.loadTexture("1.jpg");
+        var planeMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0xffffff, shininess: 200, map : texture});
+        var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -0.5 * Math.PI;
+        scene.add(plane);
+
+        var controls = new function () {
+            // we need the first child, since it's a multimaterial
+
+            this.nightView = function(){
+            	webGLRenderer.setClearColor(new THREE.Color(0x000, 1.0));
+        		scene.remove(light2);
+        		scene.remove(light3);
+
+        		
+            };
+            this.dayView = function(){
+            	webGLRenderer.setClearColor(new THREE.Color(0xaaaaff, 1.0));
+            	scene.add(light3);
+            	
+            }
+            this.viewFront = function(){
+            	camera.position.x = 12;
+		        camera.position.y = 2;
+		        camera.position.z = 0;
+		        camera.lookAt(new THREE.Vector3(0, 0, 0));
+            };
+
+	    };
+
+	    var gui = new dat.GUI();
+	    gui.add(controls, 'nightView');
+	    gui.add(controls, 'dayView');
+	    gui.add(controls, 'viewFront');
+	    
 
         render();
 
