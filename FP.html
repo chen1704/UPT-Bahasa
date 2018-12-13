@@ -4,15 +4,18 @@
 
 <head>
     <title>Kelompok 8 - UPT Bahasa</title>
-    <script type="text/javascript" src="../libs/three.js"></script>
-    <script type="text/javascript" src="../libs/OBJLoader.js"></script>
-    <script type="text/javascript" src="../libs/MTLLoader.js"></script>
-    <script type="text/javascript" src="../libs/OBJMTLLoader.js"></script>
+    <script type="text/javascript" src="three.js"></script>
+    <script type="text/javascript" src="OBJLoader.js"></script>
+    <script type="text/javascript" src="MTLLoader.js"></script>
+    <script type="text/javascript" src="OBJMTLLoader.js"></script>
 
-    <script type="text/javascript" src="../libs/stats.js"></script>
-    <script type="text/javascript" src="../libs/dat.gui.js"></script>
-    <script type="text/javascript" src="../libs/chroma.js"></script>
-    <script type="text/javascript" src="../libs/TrackballControls.js"></script>
+    <script type="text/javascript" src="stats.js"></script>
+    <script type="text/javascript" src="dat.gui.js"></script>
+    <script type="text/javascript" src="chroma.js"></script>
+
+    <script type="text/javascript" src="RectAreaLight.js"></script>
+    <script type="text/javascript" src="TrackballControls.js"></script>
+    <script type="text/javascript" src="FirstPersonControls.js"></script>
 
     <style>
         body {
@@ -32,9 +35,9 @@
 
 <!-- Javascript code that runs our Three.js examples -->
 <script type="text/javascript">
+	init_start();
 
-    // once everything is loaded, we run our Three.js stuff.
-    function init() {
+    function init_start() {
 
 
         var clock = new THREE.Clock();
@@ -47,7 +50,7 @@
         // create a camera, which defines where we're looking at.
         var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-
+        
         // create a render and set the size
         var webGLRenderer = new THREE.WebGLRenderer();
         webGLRenderer.setClearColor(new THREE.Color(0xaaaaff, 1.0));
@@ -72,16 +75,16 @@
 //        trackballControls.dynamicDampingFactor=0.3;
 
         // add spotlight for the shadows
-        var light = new THREE.DirectionalLight( 0xffffff );
-		light.position.set( 1, 1, 1 );
-		scene.add( light );
+        var light1 = new THREE.DirectionalLight( 0xffffff );
+		light1.position.set( 1, 1, 1 );
+		scene.add( light1 );
 		
-		var light = new THREE.DirectionalLight( 0x002288 );
-		light.position.set( - 1, - 1, - 1 );
-		scene.add( light );
+		var light2 = new THREE.DirectionalLight( 0xffffff );
+		light2.position.set( - 1, - 1, - 1 );
+		scene.add( light2 );
 		
-		var light = new THREE.AmbientLight( 0x222222 );
-		scene.add( light );
+		var light3 = new THREE.AmbientLight( 0x222222 );
+		scene.add( light3 );
 
         // add the output of the renderer to the html element
         document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
@@ -89,15 +92,38 @@
         // call the render function
         var step = 0;
 
-
         // setup the control gui
         var controls = new function () {
             // we need the first child, since it's a multimaterial
 
+            this.nightView = function(){
+            	webGLRenderer.setClearColor(new THREE.Color(0x000, 1.0));
+        		scene.remove(light2);
+        		scene.remove(light3);
 
-        };
+        		//var pointColor = "#ccffcc";
+		        var spotLight = new THREE.SpotLight(0xffffff);
+		        spotLight.position.set(100, 140, 130);
+		        spotLight.intensity = 2;
+		        scene.add(spotLight);   
+            };
+            this.dayView = function(){
+            	webGLRenderer.setClearColor(new THREE.Color(0xaaaaff, 1.0));
+            	scene.add(light3);
+            	
+            }
+            this.viewFront = function(){
+            	camera.position.x = 12;
+		        camera.position.y = 2;
+		        camera.position.z = 0;
+		        camera.lookAt(new THREE.Vector3(0, 0, 0));
+            };
+	    };
 
-        var gui = new dat.GUI();
+	    var gui = new dat.GUI();
+	    gui.add(controls, 'nightView');
+	    gui.add(controls, 'dayView');
+	    gui.add(controls, 'viewFront');
         var mesh;
 
         var loader = new THREE.OBJMTLLoader();
@@ -122,44 +148,11 @@
             scene.add(mesh);
         });
 
-
-        function setCamControls() {
-
-        }
-
         render();
-
-        function setRandomColors(object, scale) {
-            var children = object.children;
-
-
-            if (children && children.length > 0) {
-                children.forEach(function (e) {
-                    setRandomColors(e, scale)
-                });
-            } else {
-                // no children assume contains a mesh
-                if (object instanceof THREE.Mesh) {
-
-                    object.material.color = new THREE.Color(scale(Math.random()).hex());
-                    if (object.material.name.indexOf("building") == 0) {
-                        object.material.emissive = new THREE.Color(0x444444);
-                        object.material.transparent = true;
-                        object.material.opacity = 0.8;
-                    }
-                }
-            }
-        }
-
 
         function render() {
             stats.update();
             var delta = clock.getDelta();
-
-            if (mesh) {
-                //   mesh.rotation.y+=0.006;
-            }
-
 
             trackballControls.update(delta);
             //webGLRenderer.clear();
@@ -183,7 +176,6 @@
             return stats;
         }
     }
-    window.onload = init;
 </script>
 </body>
 </html>
